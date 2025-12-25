@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand-Drawn Floral Wallpaper Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="color"],
+        input[type="number"],
+        select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="color"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="color"] {
+            height: 50px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            grid-column: 1 / -1;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .random-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .random-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        #canvas {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            display: block;
+            background: white;
+        }
+
+        .canvas-container {
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ye lo Khusosan Ap k liye </h1>
+        <p class="subtitle">Yahan se apna wallpaper generate kar sakte ho</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="bgColor">Background Color</label>
+                <input type="color" id="bgColor" value="#FFF8F0">
+            </div>
+
+            <div class="control-group">
+                <label for="flowerType">Flower Style</label>
+                <select id="flowerType">
+                    <option value="sunflower">Sunflowers</option>
+                    <option value="rose">Roses</option>
+                    <option value="daisy">Daisies</option>
+                    <option value="mixed">Mixed Flowers</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="flowerCount">Number of Flowers (5-15)</label>
+                <input type="number" id="flowerCount" min="5" max="15" value="8">
+            </div>
+
+            <div class="control-group">
+                <label for="customText">bech ma naam waghera kuch bhi likh sakti (Optional)</label>
+                <input type="text" id="customText" placeholder="Enter your text here..." style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            </div>
+
+            <div class="control-group">
+                <label for="textSize">Text Size</label>
+                <input type="number" id="textSize" min="20" max="150" value="60" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            </div>
+
+            <div class="control-group">
+                <label for="textColor">Text Color</label>
+                <input type="color" id="textColor" value="#333333">
+            </div>
+
+            <div class="control-group">
+                <label for="textPosition">Text Position (Top to Bottom %)</label>
+                <input type="number" id="textPosition" min="10" max="90" value="50" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="generate-btn" onclick="generateWallpaper()">✨ Generate Wallpaper</button>
+            <button class="random-btn" onclick="randomize()">🎲 Random</button>
+            <button class="download-btn" onclick="downloadWallpaper()">📥 Download</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas" width="1080" height="1920"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Helper function to draw hand-drawn style lines
+        function drawHandDrawnLine(x1, y1, x2, y2, color, thickness = 3) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = thickness;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+
+            // Add some wobble for hand-drawn effect
+            const steps = 20;
+            for (let i = 1; i <= steps; i++) {
+                const t = i / steps;
+                const x = x1 + (x2 - x1) * t + (Math.random() - 0.5) * 5;
+                const y = y1 + (y2 - y1) * t + (Math.random() - 0.5) * 5;
+                ctx.lineTo(x, y);
+            }
+
+            ctx.stroke();
+        }
+
+        // Draw a sunflower
+        function drawSunflower(x, y, size, opacity = 1) {
+            // Center
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = '#8B4513';
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cross-hatch pattern in center
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 2;
+            for (let i = -5; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x - size * 0.25, y + i * 5);
+                ctx.lineTo(x + size * 0.25, y + i * 5);
+                ctx.stroke();
+            }
+
+            // Petals
+            ctx.fillStyle = '#FFD700';
+            ctx.strokeStyle = '#FFA500';
+            ctx.lineWidth = 2;
+
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const petalX = x + Math.cos(angle) * size * 0.5;
+                const petalY = y + Math.sin(angle) * size * 0.5;
+
+                ctx.beginPath();
+                ctx.ellipse(petalX, petalY, size * 0.25, size * 0.15, angle, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw a rose
+        function drawRose(x, y, size, opacity = 1) {
+            ctx.globalAlpha = opacity;
+            
+            // Petals in layers
+            const colors = ['#FF69B4', '#FF1493', '#C71585'];
+            
+            for (let layer = 0; layer < 3; layer++) {
+                ctx.fillStyle = colors[layer];
+                ctx.strokeStyle = '#C71585';
+                ctx.lineWidth = 2;
+
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2 + layer * 0.3;
+                    const radius = size * (0.6 - layer * 0.15);
+                    const petalX = x + Math.cos(angle) * radius * 0.4;
+                    const petalY = y + Math.sin(angle) * radius * 0.4;
+
+                    ctx.beginPath();
+                    ctx.ellipse(petalX, petalY, radius * 0.4, radius * 0.3, angle, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw a daisy
+        function drawDaisy(x, y, size, opacity = 1) {
+            ctx.globalAlpha = opacity;
+            
+            // Center
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // White petals
+            ctx.fillStyle = '#FFFFFF';
+            ctx.strokeStyle = '#E0E0E0';
+            ctx.lineWidth = 2;
+
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const petalX = x + Math.cos(angle) * size * 0.4;
+                const petalY = y + Math.sin(angle) * size * 0.4;
+
+                ctx.beginPath();
+                ctx.ellipse(petalX, petalY, size * 0.25, size * 0.12, angle, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw leaves
+        function drawLeaf(x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+
+            ctx.fillStyle = '#90EE90';
+            ctx.strokeStyle = '#228B22';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(size * 0.3, -size * 0.2, size, 0);
+            ctx.quadraticCurveTo(size * 0.3, size * 0.2, 0, 0);
+            ctx.fill();
+            ctx.stroke();
+
+            // Leaf vein
+            ctx.strokeStyle = '#228B22';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size, 0);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Draw decorative leaves at top
+        function drawTopLeaves() {
+            ctx.fillStyle = '#2E8B57';
+            ctx.strokeStyle = '#1a5c3a';
+            ctx.lineWidth = 3;
+
+            // Draw wavy branches
+            for (let i = 0; i < 5; i++) {
+                const startX = 100 + i * 200;
+                const startY = 50;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                
+                for (let j = 0; j < 10; j++) {
+                    const x = startX + j * 20 + Math.random() * 20;
+                    const y = startY + Math.sin(j * 0.5) * 30 + Math.random() * 20;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Add small leaves along branches
+                for (let k = 0; k < 8; k++) {
+                    const leafX = startX + k * 30;
+                    const leafY = startY + Math.sin(k * 0.5) * 30;
+                    drawLeaf(leafX, leafY, 20, Math.random() * Math.PI);
+                }
+            }
+        }
+
+        // Main function to generate wallpaper
+        function generateWallpaper() {
+            const bgColor = document.getElementById('bgColor').value;
+            const flowerType = document.getElementById('flowerType').value;
+            const flowerCount = parseInt(document.getElementById('flowerCount').value);
+
+            // Clear canvas
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw decorative top leaves
+            drawTopLeaves();
+
+            // Draw flowers
+            for (let i = 0; i < flowerCount; i++) {
+                const x = Math.random() * canvas.width;
+                const y = 300 + Math.random() * (canvas.height - 600);
+                const size = 40 + Math.random() * 60;
+                const opacity = 0.7 + Math.random() * 0.3;
+
+                // Draw stem
+                const stemBottomY = y + size;
+                const stemLength = 100 + Math.random() * 100;
+                drawHandDrawnLine(x, stemBottomY, x + (Math.random() - 0.5) * 20, stemBottomY + stemLength, '#2E8B57', 4);
+
+                // Draw leaves on stem
+                drawLeaf(x - 15, stemBottomY + 50, 25, -Math.PI / 4);
+                drawLeaf(x + 15, stemBottomY + 70, 25, Math.PI / 4);
+
+                // Draw flower based on type
+                if (flowerType === 'sunflower') {
+                    drawSunflower(x, y, size, opacity);
+                } else if (flowerType === 'rose') {
+                    drawRose(x, y, size, opacity);
+                } else if (flowerType === 'daisy') {
+                    drawDaisy(x, y, size, opacity);
+                } else if (flowerType === 'mixed') {
+                    const types = [drawSunflower, drawRose, drawDaisy];
+                    const randomFlower = types[Math.floor(Math.random() * types.length)];
+                    randomFlower(x, y, size, opacity);
+                }
+            }
+
+            // Add some purple flowers at bottom (like in your sample)
+            ctx.fillStyle = 'rgba(147, 112, 219, 0.6)';
+            for (let i = 0; i < 15; i++) {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height - 200 - Math.random() * 100;
+                const size = 20 + Math.random() * 30;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw custom text if provided
+            const customText = document.getElementById('customText').value;
+            if (customText.trim() !== '') {
+                const textSize = parseInt(document.getElementById('textSize').value);
+                const textColor = document.getElementById('textColor').value;
+                const textPosition = parseInt(document.getElementById('textPosition').value);
+
+                // Calculate vertical position
+                const yPosition = (canvas.height * textPosition) / 100;
+
+                // Set text style
+                ctx.font = `bold ${textSize}px 'Segoe UI', Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Draw text shadow for better visibility
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+
+                // Draw the text
+                ctx.fillStyle = textColor;
+                ctx.fillText(customText, canvas.width / 2, yPosition);
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            }
+        }
+
+        // Randomize colors and settings
+        function randomize() {
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            document.getElementById('bgColor').value = randomColor;
+            
+            const types = ['sunflower', 'rose', 'daisy', 'mixed'];
+            document.getElementById('flowerType').value = types[Math.floor(Math.random() * types.length)];
+            
+            document.getElementById('flowerCount').value = 5 + Math.floor(Math.random() * 10);
+            
+            generateWallpaper();
+        }
+
+        // Download wallpaper
+        function downloadWallpaper() {
+            const link = document.createElement('a');
+            link.download = 'floral-wallpaper-' + Date.now() + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Generate initial wallpaper on load
+        window.onload = () => {
+            generateWallpaper();
+        };
+    </script>
+</body>
+</html>
